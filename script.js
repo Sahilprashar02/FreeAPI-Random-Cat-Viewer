@@ -10,18 +10,25 @@ const catMeta = document.getElementById('catMeta');
 const placeholder = document.getElementById('placeholder');
 
 const API_URL = 'https://api.freeapi.app/api/v1/public/cats/cat/random';
-const IMAGE_TIMEOUT_MS = 10000; // 10 second timeout for image load
+const IMAGE_TIMEOUT_MS = 12000;
+
+let loadTimer = null;
 
 /**
  * Fetches a random cat image from the FreeAPI
  */
 async function fetchRandomCat() {
-    // UI State: Loading
     setLoading(true);
     errorState.classList.add('hidden');
     catImage.classList.add('hidden');
     shimmer.classList.remove('hidden');
     if (placeholder) placeholder.classList.remove('hidden');
+
+    // Clear any previous image load handlers
+    clearTimeout(loadTimer);
+    catImage.onload = null;
+    catImage.onerror = null;
+    catImage.src = '';
 
     try {
         const response = await fetch(API_URL);
@@ -34,54 +41,38 @@ async function fetchRandomCat() {
             const breedName = result.data.name || 'Unknown Breed';
             const origin = result.data.origin || '';
 
-            // Load image with timeout fallback — fixes async onerror not being caught
-            loadImageWithTimeout(imageUrl, IMAGE_TIMEOUT_MS)
-                .then(() => {
-                    catImage.src = imageUrl;
-                    catImage.classList.remove('hidden');
-                    shimmer.classList.add('hidden');
-                    if (placeholder) placeholder.classList.add('hidden');
-                    setLoading(false);
-                    if (catTitle) catTitle.textContent = breedName;
-                    if (catMeta) catMeta.textContent = origin ? `📍 ${origin}` : '';
-                })
-                .catch(() => showError());
+            // Set a timeout in case the CDN is unresponsive
+            loadTimer = setTimeout(() => {
+                catImage.onload = null;
+                catImage.onerror = null;
+                showError();
+            }, IMAGE_TIMEOUT_MS);
+
+            catImage.onload = () => {
+                clearTimeout(loadTimer);
+                shimmer.classList.add('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
+                catImage.classList.remove('hidden');
+                setLoading(false);
+                if (catTitle) catTitle.textContent = breedName;
+                if (catMeta) catMeta.textContent = origin ? `📍 ${origin}` : '';
+            };
+
+            catImage.onerror = () => {
+                clearTimeout(loadTimer);
+                showError();
+            };
+
+            // Set src directly on the displayed image element
+            catImage.src = imageUrl;
+
         } else {
-            throw new Error('Invalid API response structure');
+            throw new Error('No image in API response');
         }
     } catch (error) {
         console.error('Error fetching cat:', error);
         showError();
     }
-}
-
-/**
- * Loads an image URL and resolves when loaded, or rejects after timeout
- * @param {string} url - Image URL to load
- * @param {number} timeout - Timeout in milliseconds
- * @returns {Promise}
- */
-function loadImageWithTimeout(url, timeout) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-
-        const timer = setTimeout(() => {
-            img.src = ''; // cancel loading
-            reject(new Error('Image load timed out'));
-        }, timeout);
-
-        img.onload = () => {
-            clearTimeout(timer);
-            resolve();
-        };
-
-        img.onerror = () => {
-            clearTimeout(timer);
-            reject(new Error('Image failed to load'));
-        };
-
-        img.src = url;
-    });
 }
 
 /**
