@@ -2,7 +2,7 @@
 
 # 🐾 CatSnap - Random Cat Viewer
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://catsnap-viewer.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://free-api-random-cat-viewer-lake.vercel.app/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repo-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Sahilprashar02/FreeAPI-Random-Cat-Viewer)
 [![API](https://img.shields.io/badge/API-FreeAPI-blue?style=for-the-badge&logo=api&logoColor=white)](https://freeapi.app/)
 [![Language](https://img.shields.io/badge/Language-JavaScript-yellow?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
