@@ -10,7 +10,9 @@ const catMeta = document.getElementById('catMeta');
 const placeholder = document.getElementById('placeholder');
 
 const API_URL = 'https://api.freeapi.app/api/v1/public/cats/cat/random';
+const FALLBACK_API_URL = 'https://api.thecatapi.com/v1/images/search';
 const IMAGE_TIMEOUT_MS = 12000;
+const MAX_ATTEMPTS = 3;
 
 let loadTimer = null;
 
@@ -31,48 +33,121 @@ async function fetchRandomCat() {
     catImage.src = '';
 
     try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error(`Network error: ${response.status}`);
-
-        const result = await response.json();
-
-        if (result.success && result.data && result.data.image) {
-            const imageUrl = result.data.image;
-            const breedName = result.data.name || 'Unknown Breed';
-            const origin = result.data.origin || '';
-
-            // Set a timeout in case the CDN is unresponsive
-            loadTimer = setTimeout(() => {
-                catImage.onload = null;
-                catImage.onerror = null;
-                showError();
-            }, IMAGE_TIMEOUT_MS);
-
-            catImage.onload = () => {
-                clearTimeout(loadTimer);
-                shimmer.classList.add('hidden');
-                if (placeholder) placeholder.classList.add('hidden');
-                catImage.classList.remove('hidden');
-                setLoading(false);
-                if (catTitle) catTitle.textContent = breedName;
-                if (catMeta) catMeta.textContent = origin ? `📍 ${origin}` : '';
-            };
-
-            catImage.onerror = () => {
-                clearTimeout(loadTimer);
-                showError();
-            };
-
-            // Set src directly on the displayed image element
-            catImage.src = imageUrl;
-
-        } else {
-            throw new Error('No image in API response');
-        }
+        const cat = await getLoadableCat();
+        await loadImage(cat.imageUrl);
+        showCat(cat);
     } catch (error) {
         console.error('Error fetching cat:', error);
         showError();
     }
+}
+
+async function getLoadableCat() {
+    let lastError = null;
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+        try {
+            const cat = attempt === MAX_ATTEMPTS - 1
+                ? await fetchFallbackCat()
+                : await fetchFreeApiCat();
+
+            await preloadImage(cat.imageUrl);
+            return cat;
+        } catch (error) {
+            lastError = error;
+            console.warn('Cat image attempt failed:', error);
+        }
+    }
+
+    throw lastError || new Error('No loadable cat image found');
+}
+
+async function fetchFreeApiCat() {
+    const response = await fetch(API_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`FreeAPI network error: ${response.status}`);
+
+    const result = await response.json();
+    if (!result.success || !result.data || !result.data.image) {
+        throw new Error('No image in FreeAPI response');
+    }
+
+    return {
+        imageUrl: result.data.image,
+        breedName: result.data.name || 'Random Cat',
+        origin: result.data.origin || ''
+    };
+}
+
+async function fetchFallbackCat() {
+    const response = await fetch(FALLBACK_API_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Fallback API network error: ${response.status}`);
+
+    const result = await response.json();
+    if (!Array.isArray(result) || !result[0] || !result[0].url) {
+        throw new Error('No image in fallback API response');
+    }
+
+    return {
+        imageUrl: result[0].url,
+        breedName: 'Random Cat',
+        origin: ''
+    };
+}
+
+function preloadImage(imageUrl) {
+    return new Promise((resolve, reject) => {
+        const testImage = new Image();
+        const timer = setTimeout(() => {
+            testImage.onload = null;
+            testImage.onerror = null;
+            reject(new Error('Image load timed out'));
+        }, IMAGE_TIMEOUT_MS);
+
+        testImage.onload = () => {
+            clearTimeout(timer);
+            resolve();
+        };
+
+        testImage.onerror = () => {
+            clearTimeout(timer);
+            reject(new Error(`Image failed to load: ${imageUrl}`));
+        };
+
+        testImage.src = imageUrl;
+    });
+}
+
+function loadImage(imageUrl) {
+    return new Promise((resolve, reject) => {
+        clearTimeout(loadTimer);
+
+        loadTimer = setTimeout(() => {
+            catImage.onload = null;
+            catImage.onerror = null;
+            reject(new Error('Displayed image load timed out'));
+        }, IMAGE_TIMEOUT_MS);
+
+        catImage.onload = () => {
+            clearTimeout(loadTimer);
+            resolve();
+        };
+
+        catImage.onerror = () => {
+            clearTimeout(loadTimer);
+            reject(new Error(`Displayed image failed to load: ${imageUrl}`));
+        };
+
+        catImage.src = imageUrl;
+    });
+}
+
+function showCat(cat) {
+    shimmer.classList.add('hidden');
+    if (placeholder) placeholder.classList.add('hidden');
+    catImage.classList.remove('hidden');
+    setLoading(false);
+    if (catTitle) catTitle.textContent = cat.breedName;
+    if (catMeta) catMeta.textContent = cat.origin ? `📍 ${cat.origin}` : 'Freshly fetched and ready for admiration.';
 }
 
 /**
