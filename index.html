@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatSnap | Premium Random Cat Viewer</title>
+    <meta name="description" content="Discover adorable random cats with CatSnap. A premium viewing experience for cat lovers.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+</head>
+<body>
+    <div class="background-glow"></div>
+    
+    <header>
+        <div class="logo">
+            <i class="fas fa-cat"></i>
+            <span>CatSnap</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="card-container">
+            <div class="cat-card" id="catCard">
+                <div class="image-wrapper">
+                    <div class="shimmer" id="shimmer"></div>
+                    <img id="catImage" src="" alt="A cute cat" class="hidden">
+                    <div class="error-state hidden" id="errorState">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Oops! Failed to load a cat. Try again?</p>
+                    </div>
+                </div>
+                
+                <div class="content">
+                    <h1 id="catTitle">Find Your Feline Vibe</h1>
+                    <p id="catMeta">Click the button below to fetch a random adorable cat image from our collection.</p>
+                    
+                    <button id="fetchBtn" class="primary-btn">
+                        <span class="btn-text">Get Random Cat</span>
+                        <i class="fas fa-paw"></i>
+                        <div class="loader hidden" id="btnLoader"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 CatSnap. Built with <i class="fas fa-heart"></i> for Cat Lovers.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

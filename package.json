@@ -1,0 +1,17 @@
+{
+  "name": "catsnap-viewer",
+  "version": "1.0.0",
+  "description": "Premium Random Cat Viewer using FreeAPI",
+  "main": "index.html",
+  "scripts": {
+    "dev": "node ./node_modules/vite/bin/vite.js",
+    "build": "node ./node_modules/vite/bin/vite.js build",
+    "preview": "node ./node_modules/vite/bin/vite.js preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

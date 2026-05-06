@@ -1,0 +1,241 @@
+:root {
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent-glow: rgba(139, 92, 246, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Background Glow Effect */
+.background-glow {
+    position: fixed;
+    top: -10%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    z-index: -1;
+    filter: blur(80px);
+    pointer-events: none;
+}
+
+header {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--primary);
+}
+
+.logo i {
+    font-size: 1.75rem;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.card-container {
+    width: 100%;
+    max-width: 500px;
+    perspective: 1000px;
+}
+
+.cat-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px -12px rgba(139, 92, 246, 0.2);
+}
+
+.image-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #1e293b;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.image-wrapper img:hover {
+    transform: scale(1.05);
+}
+
+.image-wrapper .hidden {
+    opacity: 0;
+}
+
+/* Shimmer Animation */
+.shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(30, 41, 59, 0) 0%,
+        rgba(51, 65, 85, 0.5) 50%,
+        rgba(30, 41, 59, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+    color: #ef4444;
+}
+
+.error-state i {
+    font-size: 3rem;
+}
+
+.content {
+    padding: 2rem;
+    text-align: center;
+}
+
+.content h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.content p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.02);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.primary-btn:active {
+    transform: scale(0.98);
+}
+
+.primary-btn .loader {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none !important;
+}
+
+footer {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+footer i {
+    color: #ef4444;
+    margin: 0 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .card-container {
+        padding: 0 1rem;
+    }
+    
+    .content h1 {
+        font-size: 1.5rem;
+    }
+}
